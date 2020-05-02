@@ -2,14 +2,18 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy.util as util
 from datetime import date
+from datetime import datetime
 
 days_old = 19  # how many days old before removal
+rollingPlaylistID = '4HB3J1hdYFY20nGCtuNeQs'                        ####### '4HB3J1hdYFY20nGCtuNeQs'
+backupPlaylistID = '6PaNSKAg1JeGh3ZzxWICDM'                         #### '6PaNSKAg1JeGh3ZzxWICDM'
 
 
 # Method to show tracks
 def show_tracks(tracks):
     dates_added = []
     axed_trackIDs = []
+    num1 = 0
 
     for i, item in enumerate(tracks['items']):
         track = item['track']
@@ -21,15 +25,37 @@ def show_tracks(tracks):
     print(dates_added)
 
     today = date.today()
-    today = today.strftime("%Y-%m-%d")
+    todaystr = today.strftime("%Y-%m-%d")
     print("Today's date: ", today)
 
+    # Go through dates added dict checking for songs older than 20 days, adding them to axed tracks if true
     for item in dates_added:
-        if int(today[8:]) - int(item["date"][8:]) > days_old:  # THIS NUMBER DENOTES HOW OLD BEFORE REMOVAL IN DAYS
-            print("This item is being removed: ", item["name"], " || Days since added: ", int(today[8:]) - int(item["date"][8:]))
+        # Current track date
+        track_date = item["date"]
+        print("Track Date = ", track_date)
+
+        today = datetime.strptime(todaystr, "%Y-%m-%d")
+        track_date = datetime.strptime(track_date, "%Y-%m-%d")
+
+        # Get difference in days
+        difference_in_days = today - track_date
+
+        print("Difference in days = ", difference_in_days.days)
+
+        # Check if the difference is bigger than our allowed difference
+        if difference_in_days.days > days_old:  # THIS NUMBER DENOTES HOW OLD BEFORE REMOVAL IN DAYS
+            print("This item is being removed: ", item["name"], " || Days since added: ", num1)
             axed_trackIDs.append(item["id"])
-    # This is (userID, playlistID, list of tracks to be deleted)
-    userconn.user_playlist_remove_all_occurrences_of_tracks('11151496874', '4HB3J1hdYFY20nGCtuNeQs', axed_trackIDs)
+
+    # This is (userID, playlistID, list of tracks to be deleted) // DELETING THE TRACKS
+    userconn.user_playlist_remove_all_occurrences_of_tracks('11151496874', rollingPlaylistID, axed_trackIDs)
+
+    # Add deleted tracks to backup playlist (userID, playlistID, list of track IDs)
+    if len(axed_trackIDs) > 0:
+        userconn.user_playlist_add_tracks('11151496874', backupPlaylistID, axed_trackIDs)
+        print("REMOVED TRACKS ADDED TO BACKUP PLAYLIST")
+    else:
+        print("NO TRACKS TO BE REMOVED")
 
 
 print("Playlist Freshener")
@@ -51,7 +77,7 @@ else:
     print("Can't get token for", username)
 
 # Get playlist by ID
-playlist = sp.playlist('4HB3J1hdYFY20nGCtuNeQs')
+playlist = sp.playlist(rollingPlaylistID)
 
 print(playlist['name'])
 print('  total tracks', playlist['tracks']['total'])
