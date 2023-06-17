@@ -4,10 +4,9 @@ import spotipy.util as util
 from datetime import date
 from datetime import datetime
 
-days_old = 19  # how many days old before removal
-rollingPlaylistID = '4HB3J1hdYFY20nGCtuNeQs'                        ####### '4HB3J1hdYFY20nGCtuNeQs'
-backupPlaylistID = '6PaNSKAg1JeGh3ZzxWICDM'                         #### '6PaNSKAg1JeGh3ZzxWICDM'
-
+days_old = 6  # how many days old before removal
+rollingPlaylistID = '0rcaxuIzI76mfHK6sk6xSJ'                        ####### '0rcaxuIzI76mfHK6sk6xSJ'
+backupPlaylistID = '5AAszL0o4vOyQSuKzUJ5bv'                         #### '5AAszL0o4vOyQSuKzUJ5bv'
 
 # Method to show tracks
 def show_tracks(tracks):
@@ -44,7 +43,7 @@ def show_tracks(tracks):
 
         # Check if the difference is bigger than our allowed difference
         if difference_in_days.days > days_old:  # THIS NUMBER DENOTES HOW OLD BEFORE REMOVAL IN DAYS
-            print("This item is being removed: ", item["name"], " || Days since added: ", num1)
+            print("This item is being removed: ", item["name"])
             axed_trackIDs.append(item["id"])
 
     # This is (userID, playlistID, list of tracks to be deleted) // DELETING THE TRACKS
@@ -60,7 +59,7 @@ def show_tracks(tracks):
 
 print("Playlist Freshener")
 print("------------------")
-print("Currently removing songs from Rolling Jesh if they are %d days old" % (days_old+1))
+print("Currently removing songs from Berlin Rolling if they are %d days old" % (days_old+1))
 
 scope = 'playlist-modify-public playlist-modify-private'
 username = 'beanoclub@hotmail.com'
